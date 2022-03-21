@@ -1,2 +1,4 @@
 venv
 config.py
+wiki/__pycache__
+wiki/web/__pycache__
