@@ -14,7 +14,14 @@ Wiki Editor
 		<form method="post" class="form">
 			{{ form.hidden_tag() }}
 			{{ input(form.title, placeholder="Title", class="span7", autocomplete="off") }}
-			{{ input(form.body, placeholder="Markdown", class="span7", rows="20") }}
+            <div class="editor">
+                <div class="editor-buttons">
+                    <button type="button" onclick="boldContent()" class="editor-btn">Bold</button>
+                    <button type="button" class="editor-btn">Italics</button>
+                    <button type="button" class="editor-btn">Underline</button>
+                </div>
+			    {{ input(form.body, placeholder="Markdown", class="span7", rows="20", id="editor-text") }}
+            </div>
 			{{ input(form.tags, placeholder="Tags (comma separated)", class="span7", autocomplete="off") }}
 			<div class="form-actions">
         <div class="pull-left">
