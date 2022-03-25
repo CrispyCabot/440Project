@@ -71,7 +71,6 @@ Turns into:
     data: { body: bodycontent },
     success: function(msg) {
       $pre.html(msg);
-      console.log(msg);
     },
     error: function() {
 			$pre.addClass('alert').addClass('alert-error');
@@ -83,7 +82,6 @@ Turns into:
 function boldContent() {
     let txtarea = document.getElementById("editor-text");
     let currentVal = txtarea.value;
-    console.log(currentVal);
     //Get start and end of highlighted selection
     const start = txtarea.selectionStart;
     const end = txtarea.selectionEnd;
@@ -101,7 +99,6 @@ function boldContent() {
         else {
             //Check if it's already bolded
             if (word.substring(0, 2) === '**' && word.substring(word.length - 2) === '**') {
-                console.log("is bold: " + word);
                 newSelectedText += word.substring(2, word.length - 2) + ' ';
             }
             else {
@@ -118,7 +115,6 @@ function boldContent() {
 function italicContent() {
     let txtarea = document.getElementById("editor-text");
     let currentVal = txtarea.value;
-    console.log(currentVal);
     //Get start and end of highlighted selection
     const start = txtarea.selectionStart;
     const end = txtarea.selectionEnd;
