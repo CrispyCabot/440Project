@@ -7,7 +7,6 @@ Wiki Editor
 {% block content %}
 <ul class="nav nav-tabs">
 	<li class="active"><a href="#editor" data-toggle="tab">Editor</a></li>
-	<li><a href="#preview" data-toggle="tab" id="previewlink">Preview</a></li>
 </ul>
 <div class="tab-content">
 	<div class="tab-pane active" id="editor">
@@ -17,16 +16,14 @@ Wiki Editor
             <div class="editor">
                 <div class="editor-buttons">
                     <button type="button" onclick="boldContent()" class="editor-btn">Bold</button>
-                    <button type="button" class="editor-btn">Italics</button>
-                    <button type="button" class="editor-btn">Underline</button>
+                    <button type="button" onclick="italicContent()" class="editor-btn">Italics</button>
                 </div>
-			    {{ input(form.body, placeholder="Markdown", class="span7", rows="20", id="editor-text") }}
+			    {{ input(form.body, placeholder="Markdown", class="span7", rows="10", id="editor-text") }}
             </div>
+            <h3>Preview</h3>
+            <div id="preview"></div>
 			{{ input(form.tags, placeholder="Tags (comma separated)", class="span7", autocomplete="off") }}
 			<div class="form-actions">
-        <div class="pull-left">
-          <a class="btn" href="#preview" id="previewbtn">Preview</a>
-        </div>
 				<div class="pull-right">
           <a class="btn" href="{{ url_for('wiki.display', url=page.url) }}">Cancel</a>
 					<button class="btn btn-success" type="submit">Save</button>
@@ -34,7 +31,6 @@ Wiki Editor
 			</div>
 		</form>
 	</div>
-	<div class="tab-pane" id="preview"></div>
 </div>
 {% endblock content %}
 
@@ -64,13 +60,11 @@ Turns into:
 
 {% block postscripts -%}
 {{ super() }}
-$('#previewlink').on('click', function() {
+    function showPreview() {
 	var $form = $('.form');
   var $inputs = $form.find('input, textarea, button');
   var $pre = $('#preview');
   var bodycontent = 'title: preview\n\n' + $form.find('textarea').val();
-  $inputs.prop('disabled', true);
-  $pre.removeClass('alert').removeClass('alert-error').html("Loading...");
   $.ajax({
     url: "{{ url_for('wiki.preview') }}",
     type: "POST",
@@ -83,13 +77,82 @@ $('#previewlink').on('click', function() {
 			$pre.addClass('alert').addClass('alert-error');
       $pre.html('There was a problem with the preview.');
     },
-    complete: function() {
-      $inputs.prop('disabled', false);
-    }
   });
-});
-$('#previewbtn').on('click', function(event) {
-	event.preventDefault();
-	$('#previewlink').click();
-});
+}
+
+function boldContent() {
+    let txtarea = document.getElementById("editor-text");
+    let currentVal = txtarea.value;
+    console.log(currentVal);
+    //Get start and end of highlighted selection
+    const start = txtarea.selectionStart;
+    const end = txtarea.selectionEnd;
+    //Make sure a selection was made
+    if (start === end) {
+        return;
+    }
+    const selectedText = currentVal.substring(start, end);
+    let newSelectedText = ''
+    selectedText.split(' ').map((word) => {
+        //If a blank space is selected simply add the space and skip over it
+        if (word === '') {
+            newSelectedText += ' ';
+        }
+        else {
+            //Check if it's already bolded
+            if (word.substring(0, 2) === '**' && word.substring(word.length - 2) === '**') {
+                console.log("is bold: " + word);
+                newSelectedText += word.substring(2, word.length - 2) + ' ';
+            }
+            else {
+                newSelectedText += `**${word}** `;
+            }
+        }
+    });
+    newSelectedText = newSelectedText.trim();
+    currentVal = currentVal.replace(selectedText, newSelectedText);
+    txtarea.value = currentVal;
+    showPreview();
+}
+
+function italicContent() {
+    let txtarea = document.getElementById("editor-text");
+    let currentVal = txtarea.value;
+    console.log(currentVal);
+    //Get start and end of highlighted selection
+    const start = txtarea.selectionStart;
+    const end = txtarea.selectionEnd;
+    //Make sure a selection was made
+    if (start === end) {
+        return;
+    }
+    const selectedText = currentVal.substring(start, end);
+    let newSelectedText = ''
+    selectedText.split(' ').map((word) => {
+        //If a blank space is selected simply add the space and skip over it
+        if (word === '') {
+            newSelectedText += ' ';
+        }
+        else {
+            //Check if it's already italic AND bold
+            if ((word.substring(0, 3) === '***' && word.substring(word.length - 3) === '***') ||
+                    (word.substring(0, 1) === '*' && word.substring(word.length - 1) === '*'
+                && word.substring(0, 2) !== '**' && word.substring(word.length - 2) !== '**')) {
+                newSelectedText += word.substring(1, word.length - 1) + ' ';
+            }
+            else {
+                newSelectedText += `*${word}* `;
+            }
+        }
+    });
+    newSelectedText = newSelectedText.trim();
+    currentVal = currentVal.replace(selectedText, newSelectedText);
+    txtarea.value = currentVal;
+    showPreview();
+}
+
+    document.getElementById("editor-text").addEventListener("keyup", (event) => {
+        showPreview();
+    });
+    showPreview();
 {%- endblock postscripts %}
