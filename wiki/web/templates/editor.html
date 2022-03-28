@@ -13,15 +13,16 @@ Wiki Editor
 		<form method="post" class="form">
 			{{ form.hidden_tag() }}
 			{{ input(form.title, placeholder="Title", class="span7", autocomplete="off") }}
+            <h3>Preview</h3>
+            <div id="preview"></div>
             <div class="editor">
                 <div class="editor-buttons">
                     <button type="button" onclick="boldContent()" class="editor-btn">Bold</button>
                     <button type="button" onclick="italicContent()" class="editor-btn">Italics</button>
+                    <button type="button" onclick="h1Content()" class="editor-btn">H1</button>
                 </div>
 			    {{ input(form.body, placeholder="Markdown", class="span7", rows="10", id="editor-text") }}
             </div>
-            <h3>Preview</h3>
-            <div id="preview"></div>
 			{{ input(form.tags, placeholder="Tags (comma separated)", class="span7", autocomplete="off") }}
 			<div class="form-actions">
 				<div class="pull-right">
@@ -129,6 +130,10 @@ function italicContent() {
         if (word === '') {
             newSelectedText += ' ';
         }
+        //Skip # headers
+        else if (word === '#') {
+            newSelectedText += '#';
+        }
         else {
             //Check if it's already italic AND bold
             if ((word.substring(0, 3) === '***' && word.substring(word.length - 3) === '***') ||
@@ -146,6 +151,48 @@ function italicContent() {
     txtarea.value = currentVal;
     showPreview();
 }
+
+    function h1Content() {
+        let txtarea = document.getElementById("editor-text");
+        let currentVal = txtarea.value;
+        //Get start and end of highlighted selection
+        const start = txtarea.selectionStart;
+        const end = txtarea.selectionEnd;
+        const selectedText = currentVal.substring(start, end);
+        if (start !== end) {
+            let newVals = selectedText.split("\n").map((str) => {
+                if (str.charAt(0) === '#')
+                {
+                    return str.slice(2);
+                }
+                return `# ${str}`;
+            });
+            currentVal = currentVal.replace(selectedText, newVals.join("\n"));
+        }
+        //Nothing highlighted
+        else {
+            let index = start;
+            console.log(index);
+            let lastNewline = 0;
+            for (var i = 0; i < index; i++) {
+              if (currentVal.charAt(i) === '\n') {
+                lastNewLine = i
+                }
+            }
+            if (currentVal.charAt(lastNewLine + 1) === '#')
+            {
+                console.log(currentVal.charAt(lastNewLine + 1) === '#');
+                console.log("already h1");
+                currentVal = currentVal.slice(0, lastNewLine + 1) + currentVal.slice(lastNewLine+3)
+            }
+            else {
+                currentVal = currentVal.slice(0, lastNewLine + 1) + '# ' + currentVal.slice(lastNewLine+1);
+            }
+        }
+        txtarea.value = currentVal;
+        showPreview();
+    }
+
 
     document.getElementById("editor-text").addEventListener("keyup", (event) => {
         showPreview();
