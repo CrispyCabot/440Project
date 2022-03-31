@@ -19,7 +19,9 @@ Wiki Editor
                 <div class="editor-buttons">
                     <button type="button" onclick="boldContent()" class="editor-btn">Bold</button>
                     <button type="button" onclick="italicContent()" class="editor-btn">Italics</button>
-                    <button type="button" onclick="h1Content()" class="editor-btn">H1</button>
+                    <button type="button" onclick="hContent('#')" class="editor-btn">H1</button>
+                    <button type="button" onclick="hContent('##')" class="editor-btn">H2</button>
+                    <button type="button" onclick="hContent('###')" class="editor-btn">H3</button>
                 </div>
 			    {{ input(form.body, placeholder="Markdown", class="span7", rows="10", id="editor-text") }}
             </div>
@@ -61,6 +63,7 @@ Turns into:
 
 {% block postscripts -%}
 {{ super() }}
+const headerRegex = /##*/
     function showPreview() {
 	var $form = $('.form');
   var $inputs = $form.find('input, textarea, button');
@@ -97,6 +100,9 @@ function boldContent() {
         if (word === '') {
             newSelectedText += ' ';
         }
+        else if (word.match(headerRegex) !== null) {
+            newSelectedText += word + ' ';
+        }
         else {
             //Check if it's already bolded
             if (word.substring(0, 2) === '**' && word.substring(word.length - 2) === '**') {
@@ -131,8 +137,8 @@ function italicContent() {
             newSelectedText += ' ';
         }
         //Skip # headers
-        else if (word === '#') {
-            newSelectedText += '#';
+        else if (word.match(headerRegex) !== null) {
+            newSelectedText += word + ' ';
         }
         else {
             //Check if it's already italic AND bold
@@ -152,41 +158,45 @@ function italicContent() {
     showPreview();
 }
 
-    function h1Content() {
+    function hContent(amt) {
         let txtarea = document.getElementById("editor-text");
         let currentVal = txtarea.value;
         //Get start and end of highlighted selection
         const start = txtarea.selectionStart;
         const end = txtarea.selectionEnd;
         const selectedText = currentVal.substring(start, end);
+        //If something is highlighted
         if (start !== end) {
+            //Split at newlines checking the beginning of each line for existing header tags
             let newVals = selectedText.split("\n").map((str) => {
-                if (str.charAt(0) === '#')
+                //If header already exists, remove it
+                if (str.slice(0, amt.length) === amt)
                 {
-                    return str.slice(2);
+                    return str.slice(1 + amt.length);
                 }
-                return `# ${str}`;
+                return `${amt} ${str}`;
             });
             currentVal = currentVal.replace(selectedText, newVals.join("\n"));
         }
         //Nothing highlighted
         else {
             let index = start;
-            console.log(index);
-            let lastNewline = 0;
+            let lastNewLine = 0;
             for (var i = 0; i < index; i++) {
               if (currentVal.charAt(i) === '\n') {
                 lastNewLine = i
                 }
             }
-            if (currentVal.charAt(lastNewLine + 1) === '#')
+            if (lastNewLine === 0) {
+                lastNewLine -= 1;
+            }
+            //Already has h heading
+            if (currentVal.slice(lastNewLine + 1, lastNewLine + 1 + amt.length) === amt)
             {
-                console.log(currentVal.charAt(lastNewLine + 1) === '#');
-                console.log("already h1");
-                currentVal = currentVal.slice(0, lastNewLine + 1) + currentVal.slice(lastNewLine+3)
+                currentVal = currentVal.slice(0, lastNewLine + 1) + currentVal.slice(lastNewLine + 2 + amt.length)
             }
             else {
-                currentVal = currentVal.slice(0, lastNewLine + 1) + '# ' + currentVal.slice(lastNewLine+1);
+                currentVal = currentVal.slice(0, lastNewLine + 1) + amt + ' ' + currentVal.slice(lastNewLine+1);
             }
         }
         txtarea.value = currentVal;
