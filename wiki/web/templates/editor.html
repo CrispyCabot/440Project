@@ -22,6 +22,8 @@ Wiki Editor
                     <button type="button" onclick="hContent('#')" class="editor-btn">H1</button>
                     <button type="button" onclick="hContent('##')" class="editor-btn">H2</button>
                     <button type="button" onclick="hContent('###')" class="editor-btn">H3</button>
+                    <button type="button" onclick="hContent('*')" class="editor-btn">Unordered List</button>
+                    <button type="button" onclick="hContent('1.')" class="editor-btn">Ordered List</button>
                 </div>
 			    {{ input(form.body, placeholder="Markdown", class="span7", rows="10", id="editor-text") }}
             </div>
@@ -202,7 +204,6 @@ function italicContent() {
         txtarea.value = currentVal;
         showPreview();
     }
-
 
     document.getElementById("editor-text").addEventListener("keyup", (event) => {
         showPreview();
