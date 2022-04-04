@@ -22,7 +22,6 @@ from wiki.web import current_wiki
 from wiki.web import current_users
 from wiki.web.user import protect
 
-
 bp = Blueprint('wiki', __name__)
 
 
@@ -79,7 +78,7 @@ def edit(url):
 def preview():
     data = {}
     processor = Processor(request.form['body'])
-    data['html'], data['body'], data['meta'] = processor.process()
+    data['html'], data['body'], data['meta'], data['headers'] = processor.process()
     return data['html']
 
 
@@ -179,4 +178,3 @@ def user_delete(user_id):
 @bp.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404
-
