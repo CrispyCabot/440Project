@@ -49,16 +49,22 @@ class LoginForm(Form):
     password = PasswordField('', [InputRequired()])
 
     def validate_name(form, field):
-        user = current_users.get_user(field.data)
-        if not user:
-            raise ValidationError('This username does not exist.')
+        dbCon = sqlite3.connect(USER_DIR + '/Users.sqlite')
+        dbCur = dbCon.cursor()
+        dbCur.execute("SELECT username FROM users WHERE username = ?", (field.data,))
+        data = dbCur.fetchone()
+        # user = current_users.get_user(field.data)
+        if not data:
+            raise ValidationError('Someone Already has registered with this username')
 
     def validate_password(form, field):
-        user = current_users.get_user(form.name.data)
-        if not user:
-            return
-        if not user.check_password(field.data):
-            raise ValidationError('Username and password do not match.')
+        dbCon = sqlite3.connect(USER_DIR + '/Users.sqlite')
+        dbCur = dbCon.cursor()
+        dbCur.execute("SELECT password FROM users WHERE username = ?", (form.name.data,))
+        data = dbCur.fetchone()
+        # user = current_users.get_user(field.data)
+        if data[0] != form.password.data:
+            raise ValidationError('Incorrect Password')
 
 
 class RegisterForm(Form):
