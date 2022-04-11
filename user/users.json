@@ -17,7 +17,7 @@
     "active": true,
     "roles": [],
     "authentication_method": "cleartext",
-    "authenticated": false,
+    "authenticated": true,
     "password": "pooch"
   },
   "sammyboi": {
@@ -26,5 +26,12 @@
     "authentication_method": "cleartext",
     "authenticated": false,
     "password": "brandon"
+  },
+  "Ethan": {
+    "active": true,
+    "roles": [],
+    "authentication_method": "cleartext",
+    "authenticated": true,
+    "password": "red"
   }
 }

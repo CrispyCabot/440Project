@@ -21,20 +21,6 @@ class UserManager(object):
 
     """This is the connection to our in memory SQL database"""
 
-    """This Method checks to see if the database has been started, and creates the userTable if it does not already exist"""
-    # def dbStartup(self):
-    #     userNameTableExists = not (self.dbConnection.execute("""SELECT tableName FROM sqlite_master WHERE type='table' AND tableName='USERS'; """).fetchall() == [])
-    #     if not userNameTableExists:
-    #         self.dbConnection.execute("""
-    #         CREATE TABLE USER(
-    #         USER_NAME VARCHAR(50),
-    #         PASSWORD VARCHAR(255),
-    #         SALT VARCHAR(255));
-    #         """)
-
-
-
-
     def __init__(self, path):
         self.file = os.path.join(USER_DIR, 'users.json')
         self.dbConnection = sqlite3.connect(USER_DIR + '/Users.sqlite')
