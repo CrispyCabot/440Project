@@ -2,6 +2,8 @@
     Forms
     ~~~~~
 """
+import sqlite3
+
 from flask_wtf import Form
 from wtforms import BooleanField
 from wtforms import TextField
@@ -10,9 +12,11 @@ from wtforms import PasswordField
 from wtforms.validators import InputRequired
 from wtforms.validators import ValidationError
 
+from config import USER_DIR
 from wiki.core import clean_url
 from wiki.web import current_wiki
 from wiki.web import current_users
+from wiki.web.user import UserManager
 
 
 class URLForm(Form):
@@ -55,3 +59,21 @@ class LoginForm(Form):
             return
         if not user.check_password(field.data):
             raise ValidationError('Username and password do not match.')
+
+
+class RegisterForm(Form):
+    name = TextField('', [InputRequired()])
+    password = PasswordField('', [InputRequired()])
+
+    def validate_name(form, field):
+        dbCon = sqlite3.connect(USER_DIR + '/Users.sqlite')
+        dbCur = dbCon.cursor()
+        dbCur.execute("SELECT username FROM users WHERE username = ?", (field.data,))
+        data = dbCur.fetchone()
+        # user = current_users.get_user(field.data)
+        if data:
+            raise ValidationError('Someone Already has registered with this username')
+
+    def add_new_user(self, name, password):
+        userManager = UserManager(self)
+        userManager.add_user(name, password)
