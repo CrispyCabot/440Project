@@ -25,7 +25,7 @@
         <h3>Headers</h3>
         <ul>
             {% for header in page.headers %}
-                <li>{{ header }}</li>
+                <li><a>{{ header }}</a></li>
             {% endfor %}
         </ul>
     {% endif %}
@@ -47,5 +47,10 @@
 {% block postscripts %}
     $("h1,h2").each(function(){
     $(this).attr("id", $(this).text().replace(/\s+/g,''));
+    });
+    $("div .span3 ul:first li a").each(function(){
+    const textToReplace = $(this).text();
+    const newText = '#' + textToReplace.replace(/\s+/g,'');
+    $(this).attr("href", newText);
     });
 {% endblock %}
