@@ -1,16 +1,30 @@
 {
   "name": {
-    "active": true, 
-    "authentication_method": "cleartext", 
-    "password": "1234", 
-    "authenticated": true, 
+    "active": true,
+    "authentication_method": "cleartext",
+    "password": "1234",
+    "authenticated": true,
     "roles": []
-  }, 
+  },
   "sam": {
-    "active": true, 
-    "authentication_method": "cleartext", 
-    "password": "1234", 
-    "authenticated": true, 
+    "active": true,
+    "authentication_method": "cleartext",
+    "password": "1234",
+    "authenticated": true,
     "roles": []
+  },
+  "austin": {
+    "active": true,
+    "roles": [],
+    "authentication_method": "cleartext",
+    "authenticated": false,
+    "password": "pooch"
+  },
+  "sammyboi": {
+    "active": true,
+    "roles": [],
+    "authentication_method": "cleartext",
+    "authenticated": false,
+    "password": "brandon"
   }
 }

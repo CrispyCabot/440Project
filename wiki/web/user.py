@@ -6,17 +6,38 @@ import os
 import json
 import binascii
 import hashlib
+import sqlite3
+
 from functools import wraps
 
 from flask import current_app
 from flask_login import current_user
 
+from config import USER_DIR
 
 
 class UserManager(object):
     """A very simple user Manager, that saves it's data as json."""
+
+    """This is the connection to our in memory SQL database"""
+
+    """This Method checks to see if the database has been started, and creates the userTable if it does not already exist"""
+    # def dbStartup(self):
+    #     userNameTableExists = not (self.dbConnection.execute("""SELECT tableName FROM sqlite_master WHERE type='table' AND tableName='USERS'; """).fetchall() == [])
+    #     if not userNameTableExists:
+    #         self.dbConnection.execute("""
+    #         CREATE TABLE USER(
+    #         USER_NAME VARCHAR(50),
+    #         PASSWORD VARCHAR(255),
+    #         SALT VARCHAR(255));
+    #         """)
+
+
+
+
     def __init__(self, path):
-        self.file = os.path.join(path, 'users.json')
+        self.file = os.path.join(USER_DIR, 'users.json')
+        self.dbConnection = sqlite3.connect(USER_DIR + '/Users.sqlite')
 
     def read(self):
         if not os.path.exists(self.file):
@@ -54,6 +75,15 @@ class UserManager(object):
         users[name] = new_user
         self.write(users)
         userdata = users.get(name)
+
+        dbCur = self.dbConnection.cursor()
+        dbCur.execute("""
+        INSERT INTO users (username,password)
+        VALUES( (?) , (?));
+        """, (name, password))
+        self.dbConnection.commit()
+        dbCur.close()
+
         return User(self, name, userdata)
 
     def get_user(self, name):
@@ -131,7 +161,7 @@ def make_salted_hash(password, salt=None):
     d.update(salt[:32])
     d.update(password)
     d.update(salt[32:])
-    return binascii.hexlify(salt) + d.hexdigest()
+    return binascii.hexlify(salt) + d.hexdigest().encode('utf-8')
 
 
 def check_hashed_password(password, salted_hash):
