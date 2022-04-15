@@ -80,7 +80,7 @@ def edit(url):
 def preview():
     data = {}
     processor = Processor(request.form['body'])
-    data['html'], data['body'], data['meta'] = processor.process()
+    data['html'], data['body'], data['meta'], data['headers'] = processor.process()
     return data['html']
 
 
