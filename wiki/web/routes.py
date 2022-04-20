@@ -14,7 +14,7 @@ from flask_login import login_user
 from flask_login import logout_user
 
 from wiki.core import Processor
-from wiki.web.forms import EditorForm, RegisterForm
+from wiki.web.forms import EditorForm
 from wiki.web.forms import LoginForm
 from wiki.web.forms import SearchForm
 from wiki.web.forms import URLForm
@@ -79,7 +79,7 @@ def edit(url):
 def preview():
     data = {}
     processor = Processor(request.form['body'])
-    data['html'], data['body'], data['meta'], data['headers'] = processor.process()
+    data['html'], data['body'], data['meta'] = processor.process()
     return data['html']
 
 
@@ -184,3 +184,4 @@ def user_delete(user_id):
 @bp.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404
+
