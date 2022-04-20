@@ -175,7 +175,6 @@ def user_delete(user_id):
 def topdf(url):
     page = current_wiki.get(url)
     file = current_wiki.topdf(page)
-    print(file)
     return send_file(file, as_attachment=True)
 
 
