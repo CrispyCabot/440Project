@@ -38,9 +38,7 @@ class UserManager(object):
 
     def add_user(self, name, password,
                  active=True, roles=[], authentication_method=None):
-        users = self.read()
-        if users.get(name):
-            return False
+        # users = self.read()
         if authentication_method is None:
             authentication_method = get_default_authentication_method()
         new_user = {
@@ -58,19 +56,26 @@ class UserManager(object):
             new_user['password'] = password
         else:
             raise NotImplementedError(authentication_method)
-        users[name] = new_user
-        self.write(users)
-        userdata = users.get(name)
+        # users[name] = new_user
+        #        self.write(users)
+        #         userdata = users.get(name)
+        try:
+            dbCur = self.dbConnection.cursor()
+            dbCur.execute("""
+            INSERT INTO users (username,password)
+            VALUES( (?) , (?));
+            """, (name, password))
+            self.dbConnection.commit()
+            dbCur.close()
 
-        dbCur = self.dbConnection.cursor()
-        dbCur.execute("""
-        INSERT INTO users (username,password)
-        VALUES( (?) , (?));
-        """, (name, password))
-        self.dbConnection.commit()
-        dbCur.close()
+            dbCon = sqlite3.connect(USER_DIR + '/Users.sqlite')
+            dbCur = dbCon.cursor()
+            dbCur.execute("SELECT username FROM users WHERE username = ?", name)
+            userdata = dbCur.fetchone()
 
-        return User(self, name, userdata)
+            return User(self, name, userdata)
+        except:
+            return
 
     def get_user(self, name):
         users = self.read()
@@ -80,11 +85,14 @@ class UserManager(object):
         return User(self, name, userdata)
 
     def delete_user(self, name):
-        users = self.read()
-        if not users.pop(name, False):
-            return False
-        self.write(users)
-        return True
+
+        dbCur = self.dbConnection.cursor()
+        dbCur.execute("""
+               DELETE FROM users
+               WHERE username = ?
+               """, (name,))
+        self.dbConnection.commit()
+        dbCur.close()
 
     def update(self, name, userdata):
         data = self.read()
@@ -147,7 +155,7 @@ def make_salted_hash(password, salt=None):
     d.update(salt[:32])
     d.update(password)
     d.update(salt[32:])
-    return binascii.hexlify(salt) + d.hexdigest().encode('utf-8')
+    return binascii.hexlify(salt) + d.hexdigest()
 
 
 def check_hashed_password(password, salted_hash):
@@ -161,4 +169,5 @@ def protect(f):
         if current_app.config.get('PRIVATE') and not current_user.is_authenticated:
             return current_app.login_manager.unauthorized()
         return f(*args, **kwargs)
+
     return wrapper
