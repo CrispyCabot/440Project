@@ -2,12 +2,16 @@
     Routes
     ~~~~~~
 """
+import os.path
+from werkzeug.utils import secure_filename
+
 from flask import Blueprint
 from flask import flash
 from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
+from flask import send_file
 from flask_login import current_user
 from flask_login import login_required
 from flask_login import login_user
@@ -22,14 +26,8 @@ from wiki.web import current_wiki
 from wiki.web import current_users
 from wiki.web.user import protect
 
-from werkzeug.utils import secure_filename
-from flask import current_app
-from flask import send_from_directory
-from flask import send_file
-import os.path
-
-
 bp = Blueprint('wiki', __name__)
+
 
 @bp.route('/')
 @protect
@@ -64,70 +62,6 @@ def create():
     return render_template('create.html', form=form)
 
 
-@bp.route('/upload/')
-@protect
-def upload():
-    """
-    This function renders the upload.html template which allows you to upload a file.
-    """
-    return render_template('upload.html')
-
-
-@bp.route('/upload/', methods=['GET', 'POST'])
-def upload_file():
-    """
-    This function uploads a given file if all requirements are met.
-    """
-    # Check if they are trying to "POST" a file
-    if request.method == 'POST':
-        # Get the file and assign it to a variable
-        f = request.files['file']
-
-        # Make sure the filename is secure (e.g. no spaces in name) and then split it
-        filename = secure_filename(f.filename)
-        file, extension = os.path.splitext(filename)
-
-        # Run a while loop to check if name already exists.
-        counter = 1
-        while os.path.exists(os.path.join('content', filename)):
-            # If name already exists, rename it with a number.
-            filename = file + "(" + str(counter) + ")" + extension
-            counter += 1
-
-        # Check to see if the extension is indeed a markdown file.
-        if filename.split('.')[-1] == 'md':
-            # The next three lines reads the whole file, finds the size, and then converts it back to normal.
-            f.seek(0, 2)
-            size = f.tell()
-            f.seek(0, 0)
-            # Check to see if file size is under 200MB.
-            if size <= 200:
-                # If all requirements are met, save the file under the content folder and print a success message.
-                f.save(os.path.join('content', filename))
-                flash(f"File {filename} uploaded successfully")
-                return render_template('upload.html')
-            # If size is not under 200MB, print an error message.
-            else:
-                flash("Error: file size must be under 200MB")
-                return render_template('upload.html')
-        # If file extension not .md, print an error message.
-        else:
-            flash("Error: file extension must be .md")
-            return render_template('upload.html')
-
-
-@bp.route('/download/<path:url>', methods=['GET', 'POST'])
-@protect
-def download(url):
-    """
-    This function grabs the url of the file and allows you to download it
-    """
-    # Path from current directory to content directory
-    path = f"../../content/{url}.md"
-    # the send_file() function is built-in to Flask to download files
-    return send_file(path, as_attachment=True)
-
-
 @bp.route('/edit/<path:url>/', methods=['GET', 'POST'])
 @protect
 def edit(url):
@@ -148,7 +82,7 @@ def edit(url):
 def preview():
     data = {}
     processor = Processor(request.form['body'])
-    data['html'], data['body'], data['meta'] = processor.process()
+    data['html'], data['body'], data['meta'], data['headers'] = processor.process()
     return data['html']
 
 
@@ -238,6 +172,83 @@ def user_admin(user_id):
 def user_delete(user_id):
     pass
 
+
+@bp.route('/upload/', methods=['GET', 'POST'])
+@protect
+def upload():
+    """
+    This function uploads a given file if all requirements are met.
+    """
+    # Check if they are trying to "POST" a file
+    if request.method == 'POST':
+        # Get the file and assign it to a variable
+        f = request.files['file']
+
+        # Make sure the filename is secure (e.g. no spaces in name) and then split it
+        filename = secure_filename(f.filename)
+        file, extension = os.path.splitext(filename)
+
+        # Run a while loop to check if name already exists.
+        counter = 1
+        while os.path.exists(os.path.join('content', filename)):
+            # If name already exists, rename it with a number.
+            filename = file + "(" + str(counter) + ")" + extension
+            counter += 1
+
+        # Check to see if the extension is indeed a markdown file.
+        if filename.split('.')[-1] == 'md':
+            # The next three lines reads the whole file, finds the size, and then converts it back to normal.
+            f.seek(0, 2)
+            size = f.tell()
+            f.seek(0, 0)
+            # Check to see if file size is under 100MB.
+            if size <= 100:
+                # If all requirements are met, save the file under the content folder and print a success message.
+                f.save(os.path.join('content', filename))
+                flash(f"File {filename} uploaded successfully")
+                return render_template('upload.html')
+            # If size is not under 100MB, print an error message.
+            else:
+                flash("Error: file size must be under 100MB")
+                return render_template('upload.html')
+        # If file extension not .md, print an error message.
+        else:
+            flash("Error: file extension must be .md")
+            return render_template('upload.html')
+    # Render upload.html when first viewing page
+    else:
+        return render_template('upload.html')
+
+
+@bp.route('/tomd/<path:url>')
+def tomd(url):
+    """
+    This function grabs the url of the file and allows you to download it
+    """
+    # Path from current directory to content directory
+    path = f"../../content/{url}.md"
+    # the send_file() function is built-in to Flask to download files
+    return send_file(path, as_attachment=True)
+
+
+@bp.route('/topdf/<path:url>/')
+def topdf(url):
+    page = current_wiki.get(url)
+    file = current_wiki.topdf(page)
+    return send_file(file, as_attachment=True)
+
+
+@bp.route('/totxt/<path:url>/')
+def totxt(url):
+    page = current_wiki.get(url)
+    file = current_wiki.totxt(page)
+    return send_file(file, as_attachment=True)
+
+@bp.route('/tohtml/<path:url>')
+def tohtml(url):
+    page = current_wiki.get(url)
+    file = current_wiki.tohtml(page)
+    return send_file(file, as_attachment=True)
 
 """
     Error Handlers
