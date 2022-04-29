@@ -180,8 +180,6 @@ def user_admin(user_id):
 def user_delete(user_id):
     pass
 
-
-
 @bp.route('/upload/', methods=['GET', 'POST'])
 @protect
 def upload():
