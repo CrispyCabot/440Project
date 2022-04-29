@@ -6,3 +6,4 @@ wiki/web/__pycache__
 content
 !content/home.md
 downloads/*
+__pycache__/
