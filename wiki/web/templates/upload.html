@@ -1,0 +1,21 @@
+<!-- Extends base.html to keep the same web design through every page -->
+{% extends "base.html" %}
+
+<!-- Title at the top of the page in bold -->
+{% block title %}
+    Upload a file
+{% endblock title %}
+
+{% block content %}
+    <!-- This form is for uploading a file -->
+    <!-- It requires the POST request and mutipart/form-data is used for files-->
+    <form action="/upload/" method="POST" enctype="multipart/form-data" class="form-inline">
+	    <input type=file name=file>
+        <input type="submit" class="btn btn-success" value="Upload">
+    </form>
+{% endblock content %}
+
+<!-- Side comment thanking the user for uploading a file. Similar to the create page -->
+{% block sidebar %}
+    <p class="alert alert-success">Thank you for uploading new content!</p>
+{% endblock sidebar %}
