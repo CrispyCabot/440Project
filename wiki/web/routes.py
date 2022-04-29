@@ -8,6 +8,7 @@ from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
+from flask import send_file
 from flask_login import current_user
 from flask_login import login_required
 from flask_login import login_user
@@ -176,6 +177,25 @@ def user_admin(user_id):
 def user_delete(user_id):
     pass
 
+
+@bp.route('/topdf/<path:url>/')
+def topdf(url):
+    page = current_wiki.get(url)
+    file = current_wiki.topdf(page)
+    return send_file(file, as_attachment=True)
+
+
+@bp.route('/totxt/<path:url>/')
+def totxt(url):
+    page = current_wiki.get(url)
+    file = current_wiki.totxt(page)
+    return send_file(file, as_attachment=True)
+
+@bp.route('/tohtml/<path:url>')
+def tohtml(url):
+    page = current_wiki.get(url)
+    file = current_wiki.tohtml(page)
+    return send_file(file, as_attachment=True)
 
 """
     Error Handlers
