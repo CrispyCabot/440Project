@@ -239,6 +239,11 @@ def tomd(url):
 
 @bp.route('/topdf/<path:url>/')
 def topdf(url):
+    """
+    topdf is called on the current page. So it gets the url for the current page and then sends it to the
+    converter function which will return a file to the converted file. It then creates a preview window in a
+    separate tab in the browser that will let the user view the pdf file and download it.
+    """
     page = current_wiki.get(url)
     file = current_wiki.topdf(page)
     return send_file(file, as_attachment=True)
@@ -246,15 +251,27 @@ def topdf(url):
 
 @bp.route('/totxt/<path:url>/')
 def totxt(url):
+    """
+    totxt is called on the current page. So it gets the url for the current page and then sends it to the
+    converter function which will return a file to the converted file in this case a palin text file.
+    Then it sends that file as an attachment to the user.
+    """
     page = current_wiki.get(url)
     file = current_wiki.totxt(page)
     return send_file(file, as_attachment=True)
 
+
 @bp.route('/tohtml/<path:url>')
 def tohtml(url):
+    """
+    tohtml is called on the current page. So it gets the url for the current page and then sends it to the
+    converter function which will return a file to the converted file in this case an html document.
+    Then it sends that file as an attachment to the user.
+    """
     page = current_wiki.get(url)
     file = current_wiki.tohtml(page)
     return send_file(file, as_attachment=True)
+
 
 """
     Error Handlers

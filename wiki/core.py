@@ -399,16 +399,28 @@ class Wiki(object):
         return matched
 
     def topdf(self, page):
+        """
+        topdf will take in the current page and get the url as well as the file path to the markdown file.
+        Then it creates an html file for the page in the downloads directory. Then it converts the markdown
+        file to html using pypandoc and stores it in that file location. It then creates a pdf file for the
+        page in the downloads directory. It then takes that html file and converts it to pdf using pdfkit
+        and stores it in the that file location. Then it returns the file path for the pdf file in the
+        downloads directory.
+        """
         url = page.url
         pagepath = page.path
         html = config.DOWNLOAD_DIR + '\\' + url + '.html'
         pypandoc.convert_file(pagepath, 'html', outputfile=html)
         file = config.DOWNLOAD_DIR + '\\' + url + '.pdf'
         pdfkit.from_file(html, file, configuration=wkhtml_path)
-        #pypandoc.convert_file(pagepath, 'pdf', outputfile=file)
         return file
 
     def totxt(self, page):
+        """
+        totxt will get the current page url and the path to the markdown file. It then creates a txt file
+        in the downloads directory and uses pypandoc to convert the markdown file to plaintext. Then it
+        returns the file path of the text file in the downloads directory for download.
+        """
         url = page.url
         pagepath = page.path
         file = config.DOWNLOAD_DIR + '\\' + url + '.txt'
@@ -416,6 +428,11 @@ class Wiki(object):
         return file
 
     def tohtml(self, page):
+        """
+        tohtml will get the current page url and the path to the markdown file. It then creates an html file
+        in the downloads directory and uses pypandoc to convert the markdown file to html format. Then it
+        returns the file path of the html file in the downloads directory for download.
+        """
         url = page.url
         pagepath = page.path
         file = config.DOWNLOAD_DIR + '\\' + url + '.html'
