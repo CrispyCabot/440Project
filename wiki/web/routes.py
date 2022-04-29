@@ -181,6 +181,7 @@ def user_delete(user_id):
     pass
 
 
+
 @bp.route('/upload/', methods=['GET', 'POST'])
 @protect
 def upload():
@@ -237,7 +238,6 @@ def tomd(url):
     path = f"../../content/{url}.md"
     # the send_file() function is built-in to Flask to download files
     return send_file(path, as_attachment=True)
-
 
 @bp.route('/topdf/<path:url>/')
 def topdf(url):
