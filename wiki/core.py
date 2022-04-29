@@ -6,10 +6,19 @@ from collections import OrderedDict
 from io import open
 import os
 import re
+import pypandoc
+import pdfkit
+from pdfkit.api import configuration
+
 
 from flask import abort
 from flask import url_for
+from flask import send_file
 import markdown
+
+import config
+
+wkhtml_path = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
 
 
 def clean_url(url):
@@ -388,3 +397,28 @@ class Wiki(object):
                     matched.append(page)
                     break
         return matched
+
+    def topdf(self, page):
+        url = page.url
+        pagepath = page.path
+        html = config.DOWNLOAD_DIR + '\\' + url + '.html'
+        pypandoc.convert_file(pagepath, 'html', outputfile=html)
+        file = config.DOWNLOAD_DIR + '\\' + url + '.pdf'
+        pdfkit.from_file(html, file, configuration=wkhtml_path)
+        #pypandoc.convert_file(pagepath, 'pdf', outputfile=file)
+        return file
+
+    def totxt(self, page):
+        url = page.url
+        pagepath = page.path
+        file = config.DOWNLOAD_DIR + '\\' + url + '.txt'
+        pypandoc.convert_file(pagepath, 'plain', outputfile=file)
+        return file
+
+    def tohtml(self, page):
+        url = page.url
+        pagepath = page.path
+        file = config.DOWNLOAD_DIR + '\\' + url + '.html'
+        pypandoc.convert_file(pagepath, 'html', outputfile=file)
+        return file
+

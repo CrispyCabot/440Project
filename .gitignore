@@ -5,3 +5,4 @@ wiki/web/__pycache__
 .pytest_cache
 content
 !content/home.md
+downloads/*
