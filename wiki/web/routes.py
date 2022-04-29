@@ -18,13 +18,14 @@ from flask_login import login_user
 from flask_login import logout_user
 
 from wiki.core import Processor
-from wiki.web.forms import EditorForm
+from wiki.web.forms import EditorForm, RegisterForm
 from wiki.web.forms import LoginForm
 from wiki.web.forms import SearchForm
 from wiki.web.forms import URLForm
 from wiki.web import current_wiki
 from wiki.web import current_users
-from wiki.web.user import protect
+from wiki.web.user import protect, User
+from wiki.web.user import UserManager
 
 bp = Blueprint('wiki', __name__)
 
@@ -158,9 +159,16 @@ def user_index():
     pass
 
 
-@bp.route('/user/create/')
+"""Route used for creating a new user"""
+
+
+@bp.route('/user/create/', methods=['GET', 'POST'])
 def user_create():
-    pass
+    form = RegisterForm()
+    if form.validate_on_submit():
+        form.add_new_user(form.name.data, form.password.data)
+        return redirect(request.args.get("next") or url_for('wiki.index'))
+    return render_template('register.html', form=form)
 
 
 @bp.route('/user/<int:user_id>/')
@@ -259,3 +267,4 @@ def tohtml(url):
 @bp.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404
+

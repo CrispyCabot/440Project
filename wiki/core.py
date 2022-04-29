@@ -94,7 +94,7 @@ class Processor(object):
         self.input = text
         self.markdown = None
         self.meta_raw = None
-
+        self.headers = None
         self.pre = None
         self.html = None
         self.final = None
@@ -114,7 +114,6 @@ class Processor(object):
             Convert to HTML.
         """
         self.html = self.md.convert(self.pre)
-
 
     def split_raw(self):
         """
@@ -140,6 +139,18 @@ class Processor(object):
             self.meta[key.lower()] = \
                 '\n'.join(self.md.Meta[key.lower()])
 
+    def process_headers(self):
+        split_markdown = self.markdown.split('\n')
+        headers = []
+
+        for line in split_markdown:
+            match = re.findall('^#{1,2}(?!#)', line)
+            if len(match) > 0:
+                line = str.replace(line, '#', '')
+                line = line.strip()
+                headers.append(line)
+        self.headers = headers
+
     def process_post(self):
         """
             Content postprocessor.
@@ -158,10 +169,11 @@ class Processor(object):
         self.process_pre()
         self.process_markdown()
         self.split_raw()
+        self.process_headers()
         self.process_meta()
         self.process_post()
 
-        return self.final, self.markdown, self.meta
+        return self.final, self.markdown, self.meta, self.headers
 
 
 class Page(object):
@@ -169,6 +181,7 @@ class Page(object):
         self.path = path
         self.url = url
         self._meta = OrderedDict()
+        self.headers = []
         if not new:
             self.load()
             self.render()
@@ -182,7 +195,7 @@ class Page(object):
 
     def render(self):
         processor = Processor(self.content)
-        self._html, self.body, self._meta = processor.process()
+        self._html, self.body, self._meta, self.headers = processor.process()
 
     def save(self, update=True):
         folder = os.path.dirname(self.path)
@@ -251,7 +264,7 @@ class Wiki(object):
 
     def get(self, url):
         path = self.path(url)
-        #path = os.path.join(self.root, url + '.md')
+        # path = os.path.join(self.root, url + '.md')
         if self.exists(url):
             return Page(path, url)
         return None
@@ -309,7 +322,7 @@ class Wiki(object):
         root = os.path.abspath(self.root)
         for cur_dir, _, files in os.walk(root):
             # get the url of the current directory
-            cur_dir_url = cur_dir[len(root)+1:]
+            cur_dir_url = cur_dir[len(root) + 1:]
             for cur_file in files:
                 path = os.path.join(cur_dir, cur_file)
                 if cur_file.endswith('.md'):
