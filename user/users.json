@@ -1,16 +1,22 @@
 {
-  "name": {
-    "active": true,
-    "authentication_method": "cleartext",
-    "password": "1234",
-    "authenticated": true,
-    "roles": []
-  },
   "sam": {
     "active": true,
-    "authentication_method": "cleartext",
-    "password": "1234",
-    "authenticated": true,
-    "roles": []
+    "roles": [],
+    "authenticated": true
+  },
+  "name": {
+    "active": true,
+    "roles": [],
+    "authenticated": false
+  },
+  "Austin": {
+    "active": true,
+    "roles": [],
+    "authenticated": true
+  },
+  "cho": {
+    "active": true,
+    "roles": [],
+    "authenticated": true
   }
 }
