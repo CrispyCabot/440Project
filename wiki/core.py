@@ -18,7 +18,7 @@ import markdown
 
 import config
 
-wkhtml_path = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
+wkhtml_path = pdfkit.configuration(wkhtmltopdf=r'wkhtmltopdf\bin\wkhtmltopdf.exe')
 
 
 def clean_url(url):
