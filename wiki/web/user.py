@@ -19,8 +19,6 @@ from config import USER_DIR
 class UserManager(object):
     """A very simple user Manager, that saves it's data as json."""
 
-    """This is the connection to our in memory SQL database"""
-
     def __init__(self, path):
         self.file = os.path.join(USER_DIR, 'users.json')
         self.dbConnection = sqlite3.connect(USER_DIR + '/Users.sqlite')
@@ -38,27 +36,31 @@ class UserManager(object):
 
     def add_user(self, name, password,
                  active=True, roles=[], authentication_method=None):
-        # users = self.read()
+        users = self.read()
         if authentication_method is None:
             authentication_method = get_default_authentication_method()
+
+        """
+        This is the Only information that is stored in users.json now. The passwords are only in the database now. 
+        Removing this information from the JSON and putting it in the database was causing a lot of errors with Jinja, so I kept
+        this Json here to keep the login functionality working. Ideally everything would just be in the database, but then the
+        entire login system would have to be completely overhauled, so I left it as is for simplicity. 
+        """
         new_user = {
             'active': active,
             'roles': roles,
-            'authentication_method': authentication_method,
             'authenticated': False
         }
-        # Currently we have only two authentication_methods: cleartext and
-        # hash. If we get more authentication_methods, we will need to go to a
-        # strategy object pattern that operates on User.data.
-        if authentication_method == 'hash':
-            new_user['hash'] = make_salted_hash(password)
-        elif authentication_method == 'cleartext':
-            new_user['password'] = password
-        else:
-            raise NotImplementedError(authentication_method)
-        # users[name] = new_user
-        #        self.write(users)
-        #         userdata = users.get(name)
+
+        users[name] = new_user
+        self.write(users)
+        userdata = users.get(name)
+
+        """
+        This opens a connection to the database, and inserts the new user.
+        The new user is not inserted into the database if someone has the same
+        username.
+        """
         try:
             dbCur = self.dbConnection.cursor()
             dbCur.execute("""
@@ -128,6 +130,7 @@ class User(object):
     def get_id(self):
         return self.name
 
+    """Not Used"""
     def check_password(self, password):
         """Return True, return False, or raise NotImplementedError if the
         authentication_method is missing or unknown."""
@@ -169,4 +172,5 @@ def protect(f):
         if current_app.config.get('PRIVATE') and not current_user.is_authenticated:
             return current_app.login_manager.unauthorized()
         return f(*args, **kwargs)
+
     return wrapper

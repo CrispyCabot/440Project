@@ -48,6 +48,7 @@ class LoginForm(Form):
     name = TextField('', [InputRequired()])
     password = PasswordField('', [InputRequired()])
 
+    # This now queries to see if a user with the given username exists in the database
     def validate_name(form, field):
         dbCon = sqlite3.connect(USER_DIR + '/Users.sqlite')
         dbCur = dbCon.cursor()
@@ -55,21 +56,28 @@ class LoginForm(Form):
         data = dbCur.fetchone()
         # user = current_users.get_user(field.data)
         if not data:
-            raise ValidationError('Someone Already has registered with this username')
+            raise ValidationError('Incorrect Username')
 
+    # This now queries to check and see if the password in the database matches the one given.
     def validate_password(form, field):
         dbCon = sqlite3.connect(USER_DIR + '/Users.sqlite')
         dbCur = dbCon.cursor()
-        dbCur.execute("SELECT password FROM users WHERE username = ?", (form.name.data,))
+        dbCur.execute("SELECT * FROM users WHERE username = ?", (form.name.data,))
         data = dbCur.fetchone()
-        # user = current_users.get_user(field.data)
-        if data[0] != form.password.data:
+        if not data:
+            raise ValidationError('That User Does Not Exist')
+        if data[1] != form.password.data:
             raise ValidationError('Incorrect Password')
+
+
+"""New form for registering new users"""
 
 
 class RegisterForm(Form):
     name = TextField('', [InputRequired()])
     password = PasswordField('', [InputRequired()])
+
+    """Checks database to see if a user with the entered username exists"""
 
     def validate_name(form, field):
         dbCon = sqlite3.connect(USER_DIR + '/Users.sqlite')

@@ -7,6 +7,9 @@ from wiki.web import UserManager, create_app
 
 class TestDatabase(unittest.TestCase):
 
+    """
+    Tests to see that once a User is added into the database, their information can be accessed.
+    """
     def testThatUserCanBeAdded(self):
         app = create_app(CONTENT_DIR[:len(CONTENT_DIR)-8])
         app.app_context().push()
