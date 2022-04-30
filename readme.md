@@ -4,9 +4,12 @@ You can access the wiki [http://wiki440.ms2ms.com](http://wiki440.ms2ms.com).
 
 ## Configuration
     
-1. Update CONTENT_DIR and USER_DIR in config.py. 
+1. Update directories in config.py. 
     * CONTENT_DIR should point to the directory where your `content' is located.
     * USER_DIR should point to the directory where your `user' is located.
+    * DOWNLOAD_DIR should point to the directory where you wish to have any files download by users stored
+    * WKHTMLTOPDF_DIR should point to the path of the wkhtmltopdf.exe executable.
+         This is necessary so that files can be converted to pdf to be sent to users, There is an executable for this included in the repository but becuse of discrepancies in how windows vs mac/linux handle filepaths it is necessary to store here. 
 2. When you want to use login, make PRIVATE = True in config.py. Remember you can use id "name" and password "1234".
 3. Always use virtualenv and pip.
     * pip install -r requirements.txt
