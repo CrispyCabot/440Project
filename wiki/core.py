@@ -149,6 +149,12 @@ class Processor(object):
                 '\n'.join(self.md.Meta[key.lower()])
 
     def process_headers(self):
+        """
+            Parse headers from markdown file
+            It does this by splitting the markdown into each line, and then determining if
+            that line starts with a # or ## using regex, if it does it then adds it to a list
+            of headers that is stored in the page object.
+        """
         split_markdown = self.markdown.split('\n')
         headers = []
 
