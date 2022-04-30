@@ -25,33 +25,21 @@ text#
         html, body, _meta, headers = processor.process()
         self.assertEqual(headers,
                          ['Header 1', 'subheader 1.1', 'Header 2', 'subheader 2.1', 'subheader 2.2'])
+        markdown = """title: Some text
+tags: Tag1,Tag2,Tag3,Tag4,Tag5
 
-        self.assertEqual(html, """<p>asdfasdfasdf</p>
-<h1>Header 1</h1>
-<p>Text</p>
-<h2>subheader 1.1</h2>
-<p>text</p>
-<h3>sub-sub-header</h3>
-<p>text</p>
-<h1>Header 2</h1>
-<p>text#</p>
-<h2>subheader 2.1</h2>
-<h2>subheader 2.2</h2>""")
-
-        self.assertEqual(body, """asdfasdfasdf
-
-#Header 1
+asdfasdfasdf
+  
 Text
-## subheader 1.1
+
+text##
+
 text
-### sub-sub-header
+
 text
-#Header 2
-text#
-## subheader 2.1
-## subheader 2.2
-        """)
-        self.assertEqual(_meta, OrderedDict([('title', 'Some text'), ('tags', 'Tag1,Tag2,Tag3,Tag4,Tag5')]))
+    """
+        processor = Processor(markdown)
+        self.assertEqual(processor.headers, None)
 
 
 def suite():
