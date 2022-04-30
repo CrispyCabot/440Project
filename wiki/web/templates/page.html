@@ -21,6 +21,14 @@
 {% endblock content %}
 
 {% block sidebar %}
+{% if page.headers %}
+    <h3>Headers</h3>
+    <ul>
+        {% for header in page.headers %}
+            <li><a>{{ header }}</a></li>
+        {% endfor %}
+    </ul>
+{% endif %}
 {% if page.tags %}
 <h3>Tags</h3>
   <ul>
@@ -44,15 +52,6 @@
     <li><a href="#confirmDelete" data-toggle="modal" class="text-error">Delete</a></li>
 
 </ul>
-    {% if page.headers %}
-        <h3>Headers</h3>
-        <ul>
-            {% for header in page.headers %}
-                <li><a>{{ header }}</a></li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-
 {% endblock sidebar %}
 {% block postscripts %}
     $("h1,h2").each(function(){
