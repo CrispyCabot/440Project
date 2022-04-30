@@ -7,3 +7,4 @@ content
 !content/home.md
 downloads/*
 __pycache__/
+.log
