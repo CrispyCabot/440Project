@@ -7,6 +7,8 @@ PIC_BASE = '/static/content/'
 CONTENT_DIR = '/Users/cjbas/Desktop/440 Project/content'
 USER_DIR = '/Users/cjbas/Desktop/440 Project/user'
 DOWNLOAD_DIR = '/Users/cjbas/Desktop/440 Project/downloads'
+# This is the path to an executable that is used to convert html pages into pdf, it is included within the project but caused issues if it
+# was hardcoded in becuase of the differences in how paths are written between windows and mac/linux
 WKHTMLTOPDF_PATH = './wkhtmltopdf/bin/wkhtmltopdf.exe'
 NUMBER_OF_HISTORY = 5
 PRIVATE = True
